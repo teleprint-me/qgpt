@@ -1,6 +1,9 @@
+import os
 import sys
 
-from PySide6.QtCore import Slot
+import openai
+from dotenv import load_dotenv
+from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -12,11 +15,17 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+# Load environment variables from .env file
+load_dotenv()
+
+# Set up OpenAI API credentials
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 class ChatWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("QT GPT Toolkit")
+        self.setWindowTitle("Chat")
         self.setGeometry(200, 200, 500, 500)
 
         # Create the chat history box
@@ -45,11 +54,40 @@ class ChatWindow(QMainWindow):
         # Connect the send button to a function that handles sending messages
         self.send_button.clicked.connect(self.send_message)
 
+        # Initialize the assistant's conversation state
+        self.conversation_state = None
+
     @Slot()
     def send_message(self):
+        # Get the user's message from the input box
         message = self.input_box.text()
-        self.chat_history.appendPlainText("You: " + message)
+
+        # Clear the input box
         self.input_box.clear()
+
+        # Add the user's message to the chat history
+        self.chat_history.appendPlainText("You: " + message)
+
+        # Generate a response from the assistant
+        response = self.generate_response(message)
+
+        # Add the assistant's response to the chat history
+        self.chat_history.appendPlainText("Assistant: " + response)
+
+    def generate_response(self, message):
+        # Use OpenAI to generate a response to the user's message
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=message,
+            max_tokens=2000,
+            temperature=0.5,
+        )
+
+        # Extract the response text from the OpenAI response
+        response_text = response.choices[0].text.strip()
+
+        # Return the response text
+        return response_text
 
 
 if __name__ == "__main__":
