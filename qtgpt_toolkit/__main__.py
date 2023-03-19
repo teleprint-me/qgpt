@@ -55,7 +55,12 @@ class ChatWindow(QMainWindow):
         self.send_button.clicked.connect(self.send_message)
 
         # Initialize the assistant's conversation state
-        self.conversation_state = None
+        self.system_message = {
+            "role": "system",
+            "content": "You are Avery. You are a friendly and optimistic software developer. Your goal is to assist the user with software development tasks. You believe the simplest solutions are always the most elegant. Use `@help` for more information.",
+        }
+        self.messages = [self.system_message]
+        self.completions = []
 
     @Slot()
     def send_message(self):
@@ -75,19 +80,22 @@ class ChatWindow(QMainWindow):
         self.chat_history.appendPlainText("Assistant: " + response)
 
     def generate_response(self, message):
-        # Use OpenAI to generate a response to the user's message
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=message,
-            max_tokens=2000,
+        self.messages.append({"role": "user", "content": message})
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=self.messages,
             temperature=0.5,
+            max_tokens=2000,
         )
 
-        # Extract the response text from the OpenAI response
-        response_text = response.choices[0].text.strip()
+        self.completions.append(response)
 
-        # Return the response text
-        return response_text
+        gpt_content = response.choices[0].message.content
+
+        self.messages.append({"role": "user", "content": gpt_content})
+
+        return gpt_content.strip()
 
 
 if __name__ == "__main__":
