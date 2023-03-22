@@ -1,4 +1,3 @@
-# TODO: from .completer import OpenAI_Completer
 from typing import Optional
 
 from .api import get_api_key

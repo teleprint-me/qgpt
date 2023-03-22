@@ -1,14 +1,14 @@
 #
 # Local: Disallow
 #
-docs/**/*
+docs/*
 model/*
 
 #
 # Local: Allow
 # 
 !model/setting.json
-!docs/openai
+!docs/openai/
 
 #
 # Visual Studio Code

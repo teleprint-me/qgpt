@@ -1,6 +1,6 @@
 [tool.poetry]
 name               = "qgpt"
-version            = "0.0.3"
+version            = "0.0.5"
 description        = "A QT GUI Toolkit that treats GPT models as first class citizens."
 authors            = ["<77757836+teleprint-me@users.noreply.github.com>"]
 license            = "LGPLv3"

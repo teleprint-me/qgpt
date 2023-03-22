@@ -65,6 +65,13 @@ class MessageQueue:
         except (IndexError,):
             return {}
 
+    @property
+    def overflow(self) -> bool:
+        token_offset = 512
+        token_count = token_offset + self.token_count
+        token_max = self.max_tokens * 2
+        return token_count >= token_max
+
     def add_message(self, role: str, content: str) -> None:
         self.dequeue_messages()
         message = {"role": role.strip(), "content": content.strip()}
@@ -74,13 +81,13 @@ class MessageQueue:
             self.history.append(message)
 
     def remove_message(self, index: int = 1) -> dict[str, str]:
-        if len(self) > 1:
+        if len(self) > 2:
             return self.messages.pop(index)
         return {}
 
     def dequeue_messages(self) -> list[dict[str, str]]:
         dequeue = []
-        while len(self) > 1 and self.token_count >= self.max_tokens:
+        while len(self) > 2 and self.overflow:
             dequeue.append(self.remove_message(1))
         return dequeue
 
@@ -109,8 +116,18 @@ class MessageQueue:
 
         return content
 
-    def clear(self) -> None:
+    def clear_messages(self) -> None:
         self.messages = [self.system_message]
+
+    def clear_history(self) -> None:
+        self.history = self.messages[:]
+
+    def clear_completions(self) -> None:
+        self.completions = []
+
+    def clear(self) -> None:
+        self.clear_messages()
+        self.clear_history()
 
     def save(self) -> None:
         write_json(self.path.message, self.messages)
