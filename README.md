@@ -78,27 +78,35 @@ The ultimate goal is to minimize the barrier between the user and the assistant,
 
 #### Access to Documentation
 
--   Ability to access relevant information from publicly available documentation, such as man pages, programming languages, APIs, etc. This feature requires careful planning and attention.
+-   Q-GPT aims to enable users and the AI assistant to access relevant information from publicly available documentation, such as man pages, programming languages, APIs, etc.
 
-**Note**: This should be implemented after stabilizing memory and before introducing tooling.
+-   This feature requires careful planning and attention to ensure that the AI can understand and utilize the documentation effectively.
 
-#### Source Code
+-   To implement this feature, integration with external resources and APIs may be necessary.
 
--   Ability to interact with source code, including AI and developer collaboration in the editor.
+-   The development timeline for this feature is after stabilizing memory management and before introducing tooling and source code interaction capabilities.
 
--   In-place text editing should be available by this stage.
+**Note**: The implementation of this feature will depend on the stability and reliability of the memory management system, as well as the availability of suitable resources for documentation access.
 
--   Implementation depends on the stability and reliability of the assistant module.
+#### Text Editor
 
-#### Command Line Interface
+-   Q-GPT aims to provide a feature-rich text editor that enables seamless interaction with source code, allowing both the AI assistant and the user to collaborate effectively.
+-   The text editor will support various programming languages and file types, offering syntax highlighting, autocompletion, and other useful features to improve the overall user experience.
+-   In-place text editing will be available within the text editor, allowing users to make modifications directly within the Q-GPT interface.
+-   The development and implementation of the text editor will depend on the stability and reliability of the assistant module, as well as the availability of suitable resources for integration and customization.
 
--   Ability to interact with the command-line interface, with AI and developer collaboration.
+**Note**: The text editor will be designed with the goal of enhancing collaboration between the user and the AI assistant, making it easier to work with source code and develop software projects.
 
--   In-place text editing should be available by this stage.
+#### Command Line Interface (CLI)
 
--   Implementation depends on the stability and reliability of both the assistant and editor modules.
+-   Q-GPT will include a built-in Command Line Interface (CLI) to provide users with a seamless and powerful way to interact with their operating system and other command-line tools.
+-   The CLI will be designed for efficient collaboration between the AI assistant and the user, allowing them to work together on various tasks, such as running scripts, managing files, and executing commands.
+-   In-place text editing will be available within the CLI, allowing users to make modifications directly within the Q-GPT interface.
+-   The development and implementation of the CLI will depend on the stability and reliability of both the assistant and editor modules, as well as the availability of suitable resources for integration and customization.
 
-## Installation
+**Note**: The CLI aims to enhance the user experience by providing an intuitive interface for AI-assisted command-line interactions, ultimately simplifying various tasks and improving overall productivity.
+
+## Installation and Usage
 
 1. Clone the repository:
 
@@ -107,42 +115,32 @@ git clone https://github.com/teleprint-me/qgpt.git
 cd qgpt
 ```
 
-2. Install the required Python packages:
+2. Set up a Python virtual environment using your preferred tool (e.g., `venv` or `poetry`).
 
-The preferred method will be to use [poetry](https://python-poetry.org/docs/).
-
-- Install `pipx`
-
-```sh
-pip install --user --upgrade pipx
-pipx install poetry
-```
-
-You can update poetry with:
-
-```sh
-pipx upgrade poetry
-```
-
-- Poetry setup
-
-```sh
-poetry install
-poetry shell
-```
-
-A `requirements.txt` will be maintained for ease of use and portability. You can always use `venv` or other preferred virtual environment tool.
+-   For `venv`:
 
 ```sh
 python -m venv .venv
 source .venv/bin/activate
+```
+
+-   For `poetry`:
+
+```sh
+pip install --user --upgrade pipx
+pipx install poetry
+poetry install
+poetry shell
+```
+
+3. Install the required Python packages:
+
+```sh
 python -m pip install -U pip
 python -m pip install -r requirements.txt
 ```
 
-## Usage
-
-Run the application:
+4. Run the application:
 
 ```sh
 python qgpt
