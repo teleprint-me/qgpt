@@ -1,4 +1,3 @@
-from assistant import MessageQueue, ResponseThread
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QFont, QTextCharFormat
 from PySide6.QtWidgets import (
@@ -9,6 +8,8 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+from .thread import ResponseThread
 
 
 class ChatWidget(QWidget):
