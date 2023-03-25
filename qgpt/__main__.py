@@ -8,7 +8,6 @@ from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
     QLabel,
-    QLineEdit,
     QMainWindow,
     QMessageBox,
     QPlainTextEdit,
@@ -28,7 +27,6 @@ class Q_GPT(QMainWindow):
 
         # Create a message queue to manage the chat history
         self.message_queue = MessageQueue()
-
         # Create a response thread
         self.response_thread = ResponseThread(self.message_queue)
         self.response_thread.response_generated.connect(self.handle_response)
@@ -38,36 +36,25 @@ class Q_GPT(QMainWindow):
         self.setMenuBar(menu_bar)
 
         #
-        # Create assistant column
+        # Chat (Left) Column: Create assistant widgets
         #
-
-        # Create assistant column label
         self.chat_label = QLabel("Chat:")
-
-        # Create chat history box
         self.chat_history = QPlainTextEdit(self)
         self.chat_history.setReadOnly(True)
-
-        # Create the input box
         self.input_box = QTextEdit(self)
-
-        # Create buttons
         self.send_button = QPushButton("Send", self)
 
         # Create button layout
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.send_button)
-
-        #
         # Create chat column layout
-        #
         chat_column_layout = QVBoxLayout()
         chat_column_layout.addWidget(self.chat_history)
         chat_column_layout.addWidget(self.input_box)
         chat_column_layout.addLayout(button_layout)
 
         #
-        # Create developer column
+        # Editor (Right) Column: Create developer widgets
         #
 
         # Create developer column label
@@ -76,25 +63,13 @@ class Q_GPT(QMainWindow):
         # Create the text editor
         self.text_editor = QPlainTextEdit()
 
-        # Create the CLI
-        self.cli_input = QLineEdit()
-        self.cli_output = QTextEdit()
-        self.cli_output.setReadOnly(True)
-
-        # Create CLI layout
-        cli_layout = QVBoxLayout()
-        # cli_layout.addWidget(self.cli_label)
-        cli_layout.addWidget(self.cli_output)
-        cli_layout.addWidget(self.cli_input)
-
-        #
-        # Create developer column layout
-        #
+        # Create editor layout
         dev_column_layout = QVBoxLayout()
         dev_column_layout.addWidget(self.text_editor)
-        dev_column_layout.addLayout(cli_layout)
 
-        # Create main layout
+        #
+        # Chat-Editor hybrid interface layout
+        #
         main_layout = QHBoxLayout()
         main_layout.addLayout(chat_column_layout)
         main_layout.addLayout(dev_column_layout)

@@ -1,1 +1,1 @@
-from .menu_bar import MenuBar
+from .menubar import MenuBar
