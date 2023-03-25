@@ -9,7 +9,7 @@
     "editor.fontSize": 12,
     "editor.fontFamily": "'Noto Sans Mono', 'Source Code Pro', 'Droid Sans Mono'",
     "[json]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.defaultFormatter": "vscode.json-language-features",
         "editor.formatOnSave": true
     },
     "[jsonc]": {

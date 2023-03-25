@@ -1,9 +1,14 @@
 #
-# Local
+# Local: Disallow
 #
-gpt/*
-prompts/
-snippets/
+docs/**/*
+model/*
+
+#
+# Local: Allow
+# 
+!model/setting.json
+!docs/openai
 
 #
 # Visual Studio Code
