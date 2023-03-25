@@ -104,11 +104,27 @@ The ultimate goal is to minimize the barrier between the user and the assistant,
 
 ```sh
 git clone https://github.com/teleprint-me/qgpt.git
+cd qgpt
 ```
 
 2. Install the required Python packages:
 
 The preferred method will be to use [poetry](https://python-poetry.org/docs/).
+
+- Install `pipx`
+
+```sh
+pip install --user --upgrade pipx
+pipx install poetry
+```
+
+You can update poetry with:
+
+```sh
+pipx upgrade poetry
+```
+
+- Poetry setup
 
 ```sh
 poetry install
@@ -120,7 +136,8 @@ A `requirements.txt` will be maintained for ease of use and portability. You can
 ```sh
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -U pip
+python -m pip install -r requirements.txt
 ```
 
 ## Usage
