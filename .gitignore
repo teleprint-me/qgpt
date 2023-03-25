@@ -9,6 +9,7 @@ model/*
 # 
 !model/setting.json
 !docs/openai/
+!docs/frames/
 
 #
 # Visual Studio Code
