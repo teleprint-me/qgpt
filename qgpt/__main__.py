@@ -5,8 +5,9 @@ from PySide6.QtCore import Slot
 from PySide6.QtGui import QAction, QFont, QTextCharFormat
 from PySide6.QtWidgets import (
     QApplication,
-    QGridLayout,
     QHBoxLayout,
+    QLabel,
+    QLineEdit,
     QMainWindow,
     QMenuBar,
     QMessageBox,
@@ -14,6 +15,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QStatusBar,
     QTextEdit,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -24,29 +26,43 @@ class Q_GPT(QMainWindow):
         self.setWindowTitle("Q-GPT")
         self.setGeometry(200, 200, 500, 500)
 
+        # Create a message queue to manage the chat history
+        self.message_queue = MessageQueue()
+
+        # Create a response thread
+        self.response_thread = ResponseThread(self.message_queue)
+        self.response_thread.response_generated.connect(self.handle_response)
+
         # Create menu bar
         menu_bar = QMenuBar()
         self.setMenuBar(menu_bar)
         file_menu = menu_bar.addMenu("File")
         help_menu = menu_bar.addMenu("Help")
 
-        # Add actions to the File menu
+        # Add actions to File menu
         exit_action = QAction("Exit", self)
         exit_action.setShortcut("Ctrl+Q")
         exit_action.triggered.connect(self.exit_app)
         file_menu.addAction(exit_action)
 
-        # Add actions to the Help menu
+        # Add actions to Help menu
         about_action = QAction("About", self)
         about_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(about_action)
 
-        # Create the input box
-        self.input_box = QTextEdit(self)
+        #
+        # Create assistant column
+        #
 
-        # Create the chat history box
+        # Create assistant column label
+        self.chat_label = QLabel("Chat:")
+
+        # Create chat history box
         self.chat_history = QPlainTextEdit(self)
         self.chat_history.setReadOnly(True)
+
+        # Create the input box
+        self.input_box = QTextEdit(self)
 
         # Create buttons
         self.clear_button = QPushButton("Clear", self)
@@ -54,26 +70,57 @@ class Q_GPT(QMainWindow):
         self.load_button = QPushButton("Load", self)
         self.send_button = QPushButton("Send", self)
 
-        # Create a horizontal layout for buttons
+        # Create button layout
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.clear_button)
         button_layout.addWidget(self.load_button)
         button_layout.addWidget(self.save_button)
         button_layout.addWidget(self.send_button)
 
-        # Create a grid layout
-        grid_layout = QGridLayout()
+        #
+        # Create chat column layout
+        #
+        chat_column_layout = QVBoxLayout()
+        chat_column_layout.addWidget(self.chat_history)
+        chat_column_layout.addWidget(self.input_box)
+        chat_column_layout.addLayout(button_layout)
 
-        # Add input box and chat history box to the grid layout
-        grid_layout.addWidget(self.chat_history, 0, 0)
-        grid_layout.addWidget(self.input_box, 0, 1)
+        #
+        # Create developer column
+        #
 
-        # Add button container to the grid layout
-        grid_layout.addLayout(button_layout, 1, 0, 1, 2)
+        # Create developer column label
+        self.text_label = QLabel("Editor:")
 
-        # Create a central widget and set the grid layout
+        # Create the text editor
+        self.text_editor = QPlainTextEdit()
+
+        # Create the CLI
+        self.cli_input = QLineEdit()
+        self.cli_output = QTextEdit()
+        self.cli_output.setReadOnly(True)
+
+        # Create CLI layout
+        cli_layout = QVBoxLayout()
+        # cli_layout.addWidget(self.cli_label)
+        cli_layout.addWidget(self.cli_output)
+        cli_layout.addWidget(self.cli_input)
+
+        #
+        # Create developer column layout
+        #
+        dev_column_layout = QVBoxLayout()
+        dev_column_layout.addWidget(self.text_editor)
+        dev_column_layout.addLayout(cli_layout)
+
+        # Create main layout
+        main_layout = QHBoxLayout()
+        main_layout.addLayout(chat_column_layout)
+        main_layout.addLayout(dev_column_layout)
+
+        # Create a central widget and set the main layout
         central_widget = QWidget()
-        central_widget.setLayout(grid_layout)
+        central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
         # Connect buttons to corresponding functions
@@ -85,13 +132,6 @@ class Q_GPT(QMainWindow):
         # Create a status bar
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
-
-        # Create a message queue to manage the chat history
-        self.message_queue = MessageQueue()
-
-        # Create a response thread
-        self.response_thread = ResponseThread(self.message_queue)
-        self.response_thread.response_generated.connect(self.handle_response)
 
         self.update_status_bar()
         self.load_chat_history()

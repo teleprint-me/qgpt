@@ -6,5 +6,5 @@ completions, memory, settings, and conversation threads.
 
 from .memory import AssistantMemory
 from .queue import MessageQueue
-from .setting import AssistantPath
+from .setting import AssistantPath, AssistantSetting
 from .thread import ResponseThread
