@@ -1,63 +1,85 @@
 import sys
 
-from assistant import MessageQueue
+from assistant import MessageQueue, ResponseThread
 from PySide6.QtCore import Slot
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QFont, QTextCharFormat
 from PySide6.QtWidgets import (
     QApplication,
+    QGridLayout,
     QHBoxLayout,
-    QLineEdit,
     QMainWindow,
+    QMenuBar,
+    QMessageBox,
     QPlainTextEdit,
     QPushButton,
     QStatusBar,
-    QVBoxLayout,
+    QTextEdit,
     QWidget,
 )
 
 
-class ChatWindow(QMainWindow):
+class Q_GPT(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Q-GPT")
         self.setGeometry(200, 200, 500, 500)
 
-        # Add the file menu bar
-        self.menu = self.menuBar()
-        self.file_menu = self.menu.addMenu("File")
+        # Create menu bar
+        menu_bar = QMenuBar()
+        self.setMenuBar(menu_bar)
+        file_menu = menu_bar.addMenu("File")
+        help_menu = menu_bar.addMenu("Help")
 
-        # Create menu bar exit option
+        # Add actions to the File menu
         exit_action = QAction("Exit", self)
         exit_action.setShortcut("Ctrl+Q")
         exit_action.triggered.connect(self.exit_app)
+        file_menu.addAction(exit_action)
 
-        # Add exit option to menu bar
-        self.file_menu.addAction(exit_action)
+        # Add actions to the Help menu
+        about_action = QAction("About", self)
+        about_action.triggered.connect(self.show_about_dialog)
+        help_menu.addAction(about_action)
+
+        # Create the input box
+        self.input_box = QTextEdit(self)
 
         # Create the chat history box
         self.chat_history = QPlainTextEdit(self)
         self.chat_history.setReadOnly(True)
 
-        # Create the input box and send button
-        self.input_box = QLineEdit(self)
+        # Create buttons
+        self.clear_button = QPushButton("Clear", self)
+        self.save_button = QPushButton("Save", self)
+        self.load_button = QPushButton("Load", self)
         self.send_button = QPushButton("Send", self)
 
-        # Create a layout for the input box and send button
-        input_layout = QHBoxLayout()
-        input_layout.addWidget(self.input_box)
-        input_layout.addWidget(self.send_button)
+        # Create a horizontal layout for buttons
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.clear_button)
+        button_layout.addWidget(self.load_button)
+        button_layout.addWidget(self.save_button)
+        button_layout.addWidget(self.send_button)
 
-        # Create a layout for the chat history and input box/send button layout
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(self.chat_history)
-        main_layout.addLayout(input_layout)
+        # Create a grid layout
+        grid_layout = QGridLayout()
 
-        # Create a central widget and set the main layout
+        # Add input box and chat history box to the grid layout
+        grid_layout.addWidget(self.chat_history, 0, 0)
+        grid_layout.addWidget(self.input_box, 0, 1)
+
+        # Add button container to the grid layout
+        grid_layout.addLayout(button_layout, 1, 0, 1, 2)
+
+        # Create a central widget and set the grid layout
         central_widget = QWidget()
-        central_widget.setLayout(main_layout)
+        central_widget.setLayout(grid_layout)
         self.setCentralWidget(central_widget)
 
-        # Connect the send button to a function that handles sending messages
+        # Connect buttons to corresponding functions
+        self.clear_button.clicked.connect(self.clear_chat_history)
+        self.save_button.clicked.connect(self.save_chat_history)
+        self.load_button.clicked.connect(self.load_chat_history)
         self.send_button.clicked.connect(self.send_message)
 
         # Create a status bar
@@ -67,38 +89,101 @@ class ChatWindow(QMainWindow):
         # Create a message queue to manage the chat history
         self.message_queue = MessageQueue()
 
+        # Create a response thread
+        self.response_thread = ResponseThread(self.message_queue)
+        self.response_thread.response_generated.connect(self.handle_response)
+
         self.update_status_bar()
+        self.load_chat_history()
 
-        self.display_message_history()
+    def update_status_bar(self):
+        self.statusBar.clearMessage()
+        count = str(self.message_queue.token_count)
+        assistant = self.message_queue.assistant.capitalize()
+        max = self.message_queue.max_tokens
+        self.statusBar.showMessage(
+            f"Role: {assistant} | Max Tokens: {max} | Total Tokens: {count}"
+        )
 
-    def display_message_history(self):
+    def update_status_bar_pending(self):
+        self.statusBar.clearMessage()
+        assistant = self.message_queue.assistant.capitalize()
+        self.statusBar.showMessage(
+            f"{assistant} is processing your request..."
+        )
+
+    def clear_chat_history(self):
+        self.message_queue.clear()
+        self.chat_history.clear()
+        self.update_status_bar()
+        self.load_chat_history()
+
+    def save_chat_history(self):
+        self.message_queue.save()
+
+    def load_chat_history(self):
+        self.chat_history.clear()
         for message in self.message_queue.history:
             role = message["role"]
             content = message["content"]
-            self.chat_history.appendPlainText(
-                f"{role.capitalize()}: {content}\n"
-            )
 
-    def update_status_bar(self):
-        count = str(self.message_queue.token_count)
-        name = self.message_queue.assistant.capitalize()
-        self.statusBar.showMessage(f"{name} is using {count} tokens")
+            cursor = self.chat_history.textCursor()
+            format_bold = QTextCharFormat()
+            format_bold.setFontWeight(QFont.Bold)
+            format_normal = QTextCharFormat()
+            format_normal.setFontWeight(QFont.Normal)
+
+            cursor.insertText(f"{role.capitalize()}\n", format_bold)
+            cursor.insertText(f"{content}\n\n", format_normal)
+            self.chat_history.setTextCursor(cursor)
+
+    @Slot()
+    def show_about_dialog(self):
+        QMessageBox.information(
+            self,
+            "About",
+            "Q-GPT is a QT GUI Toolkit that integrates GPT models as first-class components in the application. It provides an easy way to create GUI applications that interact with GPT models, enabling seamless communication and response handling.",
+        )
 
     @Slot()
     def send_message(self):
         # Get the user's message from the input box
-        message = self.input_box.text()
+        message = self.input_box.toPlainText().strip()
         # Clear the input box
         self.input_box.clear()
+
         # Add the user's message to the chat history
-        self.chat_history.appendPlainText(f"User: {message}\n")
+        cursor = self.chat_history.textCursor()
+        format_bold = QTextCharFormat()
+        format_bold.setFontWeight(QFont.Bold)
+        format_normal = QTextCharFormat()
+        format_normal.setFontWeight(QFont.Normal)
+
+        cursor.insertText("User\n", format_bold)
+        cursor.insertText(f"{message}\n\n", format_normal)
+        self.chat_history.setTextCursor(cursor)
+
         # Add user message to message queue
         self.message_queue.add_message("user", message)
-        # Generate a response from the assistant
-        response = self.message_queue.generate_completion()
+        # Update the status bar to show "message pending"
+        self.update_status_bar_pending()
+        # Start the response thread
+        self.response_thread.start()
+
+    @Slot(str)
+    def handle_response(self, response):
         # Add the assistant's response to the chat history
-        self.chat_history.appendPlainText(f"Assistant: {response}\n")
-        # Update the status bar
+        cursor = self.chat_history.textCursor()
+        format_bold = QTextCharFormat()
+        format_bold.setFontWeight(QFont.Bold)
+        format_normal = QTextCharFormat()
+        format_normal.setFontWeight(QFont.Normal)
+
+        cursor.insertText("Assistant\n", format_bold)
+        cursor.insertText(f"{response}\n\n", format_normal)
+        self.chat_history.setTextCursor(cursor)
+
+        # Update the status bar to show "message complete"
         self.update_status_bar()
 
     def closeEvent(self, event):
@@ -114,6 +199,6 @@ class ChatWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = ChatWindow()
+    window = Q_GPT()
     window.show()
     sys.exit(app.exec())
