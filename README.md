@@ -1,6 +1,6 @@
 # Q-GPT
 
-Q-GPT is a powerful and user-friendly Graphical User Interface (GUI) built with Qt and PySide6, specifically designed for seamless interaction with OpenAI's GPT language models. It aims to provide an efficient and intuitive way to communicate with the AI, simplifying the experience for users and developers alike.
+Q-GPT is (going to be) a powerful and user-friendly (hopefully) Graphical User Interface (GUI) built with Qt and PySide6 (definitely), specifically designed for seamless interaction with OpenAI's GPT language models (fingers crossed). It aims to provide an efficient and intuitive way to communicate with the AI (yes), simplifying the experience for users and developers alike (I like the thought of this, at least).
 
 **Note**: Q-GPT is currently a Work In Progress (WIP). As the project progresses, working prototypes will be made available through tagged releases.
 
