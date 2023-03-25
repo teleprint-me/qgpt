@@ -103,12 +103,23 @@ The ultimate goal is to minimize the barrier between the user and the assistant,
 1. Clone the repository:
 
 ```sh
-git clone https://github.com/your_username/q-gpt.git
+git clone https://github.com/teleprint-me/q-gpt.git
 ```
 
 2. Install the required Python packages:
 
+The preferred method will be to use [poetry](https://python-poetry.org/docs/).
+
 ```sh
+poetry install
+poetry shell
+```
+
+A `requirements.txt` will be maintained for ease of use and portability. You can always use `venv` or other preferred virtual environment tool.
+
+```sh
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
