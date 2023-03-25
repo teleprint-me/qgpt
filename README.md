@@ -103,7 +103,7 @@ The ultimate goal is to minimize the barrier between the user and the assistant,
 1. Clone the repository:
 
 ```sh
-git clone https://github.com/teleprint-me/q-gpt.git
+git clone https://github.com/teleprint-me/qgpt.git
 ```
 
 2. Install the required Python packages:
