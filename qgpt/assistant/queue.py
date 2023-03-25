@@ -69,8 +69,7 @@ class MessageQueue:
     def overflow(self) -> bool:
         token_offset = 512
         token_count = token_offset + self.token_count
-        token_max = self.max_tokens * 2
-        return token_count >= token_max
+        return token_count >= self.max_tokens
 
     def add_message(self, role: str, content: str) -> None:
         self.dequeue_messages()

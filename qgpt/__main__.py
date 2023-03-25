@@ -1,15 +1,15 @@
 import sys
 
 from assistant import MessageQueue, ResponseThread
+from gui import MenuBar
 from PySide6.QtCore import Slot
-from PySide6.QtGui import QAction, QFont, QTextCharFormat
+from PySide6.QtGui import QFont, QTextCharFormat
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QMainWindow,
-    QMenuBar,
     QMessageBox,
     QPlainTextEdit,
     QPushButton,
@@ -34,21 +34,8 @@ class Q_GPT(QMainWindow):
         self.response_thread.response_generated.connect(self.handle_response)
 
         # Create menu bar
-        menu_bar = QMenuBar()
+        menu_bar = MenuBar()
         self.setMenuBar(menu_bar)
-        file_menu = menu_bar.addMenu("File")
-        help_menu = menu_bar.addMenu("Help")
-
-        # Add actions to File menu
-        exit_action = QAction("Exit", self)
-        exit_action.setShortcut("Ctrl+Q")
-        exit_action.triggered.connect(self.exit_app)
-        file_menu.addAction(exit_action)
-
-        # Add actions to Help menu
-        about_action = QAction("About", self)
-        about_action.triggered.connect(self.show_about_dialog)
-        help_menu.addAction(about_action)
 
         #
         # Create assistant column
@@ -65,16 +52,10 @@ class Q_GPT(QMainWindow):
         self.input_box = QTextEdit(self)
 
         # Create buttons
-        self.clear_button = QPushButton("Clear", self)
-        self.save_button = QPushButton("Save", self)
-        self.load_button = QPushButton("Load", self)
         self.send_button = QPushButton("Send", self)
 
         # Create button layout
         button_layout = QHBoxLayout()
-        button_layout.addWidget(self.clear_button)
-        button_layout.addWidget(self.load_button)
-        button_layout.addWidget(self.save_button)
         button_layout.addWidget(self.send_button)
 
         #
@@ -124,9 +105,6 @@ class Q_GPT(QMainWindow):
         self.setCentralWidget(central_widget)
 
         # Connect buttons to corresponding functions
-        self.clear_button.clicked.connect(self.clear_chat_history)
-        self.save_button.clicked.connect(self.save_chat_history)
-        self.load_button.clicked.connect(self.load_chat_history)
         self.send_button.clicked.connect(self.send_message)
 
         # Create a status bar
@@ -231,10 +209,6 @@ class Q_GPT(QMainWindow):
         self.message_queue.save()
         # Exit program
         event.accept()
-
-    @Slot()
-    def exit_app(self, checked):
-        QApplication.quit()
 
 
 if __name__ == "__main__":
